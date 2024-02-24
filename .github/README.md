@@ -27,6 +27,7 @@ ReplayMix+ includes all tracks in your library, including uploaded tracks, unlik
 Playlists can be generated at any time by running the console application and updating them. There are no set intervals for playlist generation, however- the process is currently manual.
 
 > How does ReplayMix+ determine the playlist order?
+> 
 ReplayMix+ uses a small algorithm that considers factors such as how frequently a track has been listened to, how recently it was listened to, and how many times it was listened to on loop.
 
 > I feel like the algorithm is off, it prioritizes tracks that it shouldn't.
@@ -79,11 +80,11 @@ If the issue is with a video that has a name like "artist - track (cover)" or so
 
 This is how the track used to look as a YouTube video:
 
-![Old version of a track as a video](.github/IMAGES/kyo_smells_old.png)
+![Old version of a track as a video](/.github/IMAGES/kyo_smells_old.png)
 
 I decided to download the track then apply some metadata magic to it, which resulted in this:
 
-![New version of a track as an upload](.github/IMAGES/kyo_smells_new.png)
+![New version of a track as an upload](/.github/IMAGES/kyo_smells_new.png)
 
 Now the title has been fixed and it shows up very well on my last.fm, also reducing the issue of the track being scrobbled with the previous track's album.
 
