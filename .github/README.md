@@ -2,7 +2,7 @@
 ReplayMix+ is a playlist generator for YouTube Music inspired by the native Replay Mix. It addresses the limitations of the original Replay Mix by including all tracks in a user's library, including uploaded tracks, managing original and cover tracks, and avoiding ignoring tracks for no apparent reason.
 
 ![GitHub License](https://img.shields.io/github/license/soreikomori/ReplayMixPlus)
-![GitHub Release](https://img.shields.io/github/v/release/soreikomori/ReplayMixPlus?color=%234287f5)
+![GitHub Release](https://img.shields.io/github/v/release/soreikomori/ReplayMixPlus?cacheSeconds=https%3A%2F%2Fgithub.com%2Fsoreikomori%2FReplayMixPlus%2Freleases%2Flatest)
 
 ## Features
 - Generates a custom playlist based on your last 7 days of last.fm listening history, including uploaded tracks.
