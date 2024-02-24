@@ -95,6 +95,10 @@ The solution then is storing these edits within ReplayMix+, something that I am 
 
 Feel free to make a pull request with anything you like. I'll take a look at some point. If you want to get more hands on with the project, contact `soreikomori` on Discord.
 
+## Acknowledgements
+
+This code uses [pyLast](https://github.com/pylast/pylast) and [ytmusicapi](https://github.com/sigma67/ytmusicapi). If it weren't for these two, I would still be dreaming of this.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details. Note that pylast uses the Apache 2.0 license, also included [in their repo](https://github.com/pylast/pylast/blob/main/LICENSE.txt).
