@@ -79,11 +79,11 @@ If the issue is with a video that has a name like "artist - track (cover)" or so
 
 This is how the track used to look as a YouTube video:
 
-![Screenshot](image-1.png)
+![Old version of a track as a video](./github/kyo_smells_old.png)
 
 I decided to download the track then apply some metadata magic to it, which resulted in this:
 
-![alt text](image-2.png)
+![New version of a track as an upload](./github/kyo_smells_new.png)
 
 Now the title has been fixed and it shows up very well on my last.fm, also reducing the issue of the track being scrobbled with the previous track's album.
 
