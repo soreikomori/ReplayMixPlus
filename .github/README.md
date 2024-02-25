@@ -10,59 +10,66 @@ ReplayMix+ is a playlist generator for YouTube Music inspired by the native Repl
 - One-click-run self-contained console for ease of use.
 
 ## Requirements
-Python 3.8 or higher.
+Python 3.8 or higher. Your python **MUST** be an environment variable (be in PATH).
 
 ## Installation and Usage
 
 Download the latest release from the [releases page](https://github.com/soreikomori/ReplayMixPlus/releases), then unzip it wherever you want and execute `ReplayMixPlusConsole.py`. This last file will also be your updater.
 
-## FAQ
+## FAQ and Common Errors
 
->  How does ReplayMix+ handle uploaded tracks?
+### Questions
+
+>  **How does ReplayMix+ handle uploaded tracks?**
 
 ReplayMix+ includes all tracks in your library, including uploaded tracks, unlike the original Replay Mix. It does this by cross-checking the title between last.fm and YTM.
 
-> How often are playlists generated?
+> **How often are playlists generated?**
 
 Playlists can be generated at any time by running the console application and updating them. There are no set intervals for playlist generation, however- the process is currently manual.
 
-> How does ReplayMix+ determine the playlist order?
-> 
+> **How does ReplayMix+ determine the playlist order?**
+
 ReplayMix+ uses a small algorithm that considers factors such as how frequently a track has been listened to, how recently it was listened to, and how many times it was listened to on loop.
 
-> I feel like the algorithm is off, it prioritizes tracks that it shouldn't.
+> **I feel like the algorithm is off, it prioritizes tracks that it shouldn't.**
 
 The algorithm for this is actually rather simple and based on the weight that you give to 3 variables: number of scrobbles, time since last scrobble, and number of playbacks on loop only. If you want to change the weights, take a look at the `calcScore` function in generatorEngine.py. There's a comment that tells you which values to change.
 
-> Is there a limit to the size of the generated playlist? Can I change it?
+> **Is there a limit to the size of the generated playlist? Can I change it?**
 
 100 tracks, currently. If you wish to change the size of the playlist, take a look at `fetchTopTracks()` in `generatorEngine.py`. I added some comments so you know what to change.
 
-> Is there a GUI available?
+> **Is there a GUI available?**
 
 No. ReplayMix+ uses a console-based interface for simplicity.
 
-> I get an error when trying to register with Google!
- 
-This might happen depending on your browser or extensions. I use Firefox, for examlpe, and it never works for some reason, so I just copy the URL to Edge instead. Some tracker removal extensions can also meddle with the process, so you might want to try disabling them for a bit.
-
-> Why do I have to input my last.fm password?
+> **Why do I have to input my last.fm password?**
 
 In order for the API to communicate with your last.fm and ask for data, it needs to authenticate that you're the one using it by using your password hashed with MD5. This means that, after you input it, it will be saved on lastfmcreds.json and will never leave your device- as pyLast will only communicate using the hashed version. 
 
-> What's the "Compendium"?
+> **What's the "Compendium"?**
 
 It's the term I give a file called `ytm_compendium.json`. It pulls all of the tracks in all of your playlists so that no matter what you're listening to, it will have it at the ready to compare with the list of tracks from last.fm.
 
-> How much space does this take up?
+> **How much space does this take up?**
 
 Everything except for the compendium doesn't take more than 200KB. The compendium is the heavy one, which depends on the amount of tracks on your playlists. It's somewhere around 1KB per track, maybe less. Mine has 16391 tracks and is around 7.6MB. So all in all not too much.
 
-> Will this work for tracks not in the latin alphabet?
+> **Will this work for tracks not in the latin alphabet?**
 
 I haven't given it a try with every language, but I have some tracks in Japanese and Russian (Cyrillic) and it works. It's probably compatible with anything utf-8, but I don't know enough about Unicode stuffs to say for sure.
 
-> I get "Could not find the track [track] in the Compendium.", what do I do?
+### Errors
+> **I get an error on my browser when trying to register with Google!**
+ 
+This might happen depending on your browser or extensions. I use Firefox, for example, and it never works for some reason, so I just copy the URL to Edge instead. Some tracker removal extensions can also meddle with the process, so you might want to try disabling them for a bit.
+
+> **The console won't open- it always crashes!**
+
+Try opening a .cmd (or terminal) first and execute it from there (type `ReplayMixPlusConsole.py` after you've navigated to the directory).
+
+> **I get "Could not find the track [track] in the Compendium.", what do I do?**
 
 **Update your compendium.**
 

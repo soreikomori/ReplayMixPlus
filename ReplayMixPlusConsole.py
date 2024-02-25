@@ -1,6 +1,6 @@
 """
 Replay Mix+ by soreikomori
-v1.1.0
+v1.2.0
 https://github.com/soreikomori/ReplayMixPlus
 """
 import importlib.metadata as metadata
@@ -87,29 +87,77 @@ def initialSetup():
     print("")
     print("In order to fetch data from both YouTube Music and last.fm, you will need to authenticate yourself in their websites.")
     print("Let's begin with YouTube Music, which uses oauth.")
-    print("A new terminal window will open, which will prompt you to connect your Google account to an API.")
-    print("Make sure to choose the right account that has your YTM library.")
-    input("Press Enter to continue...")
-    os.system("ytmusicapi oauth")
-    print("")
-    input("Once the authentication is done (you see a \"RefreshingToken\" response above), press Enter again.")
-    print("")
+    if loadJson("oauth.json") != None:
+        print("")
+        print("Oh, it looks like you already have credentials- If you're repeating the initial setup and want to skip this step, type 1 then Enter.")
+        print("If you want to authenticate again, type 2 then Enter.")
+        while True:
+            ans = input("")
+            if ans == "1":
+                break
+            elif ans == "2":
+                print("A new terminal window will open, which will prompt you to connect your Google account to an API.")
+                print("Make sure to choose the right account that has your YTM library.")
+                input("Press Enter to continue...")
+                os.system("ytmusicapi oauth")
+                print("")
+                input("Once the authentication is done (you see a \"RefreshingToken\" response above), press Enter again.")
+                print("")
+                break
+            else:
+                print("Invalid input.")
+    else:
+        print("A new terminal window will open, which will prompt you to connect your Google account to an API.")
+        print("Make sure to choose the right account that has your YTM library.")
+        input("Press Enter to continue...")
+        os.system("ytmusicapi oauth")
+        print("")
+        input("Once the authentication is done (you see a \"RefreshingToken\" response above), press Enter again.")
+        print("")
     import generatorEngine as gE
+    import compendiumEngine as cE
     print("Now we authenticate last.fm.")
-    print("Note that this will require your username and password. You will have to paste them here.")
-    print("First off is generating an API key for yourself.")
-    print("You will be redirected to a website, where you will create an API account.")
-    print("Just fill in the data. If you don't have a Callback URL or Application Homepage, you can leave those fields blank.")
-    print("Once your account is created, you'll get an API Key and Shared Secret, which you will paste here.")
-    input("Press Enter to open the Last.fm API website.")
-    webbrowser.open("https://www.last.fm/api/account/create")
-    print("")
-    apiKey = input("Paste your API Key here: ").strip()
-    shaSecret = input("Paste your Shared Secret here: ").strip()
-    username = input("Input your last.fm username (case sensitive): ").strip()
-    passwd = input("Input your last.fm password: ")
-    lastFmCreds = {"apikey": apiKey, "apisecret": shaSecret, "username": username, "password": passwd}
-    cE.writeIntoJson(lastFmCreds, "lastfmcreds.json")
+    if loadJson("lastfmcreds.json") != None:
+        print("")
+        print("Ah, it looks like you already have credentials- If you're repeating the initial setup and want to skip this step, type 1 then Enter.")
+        print("If you want to authenticate again, type 2 then Enter.")
+        while True:
+            ans = input("")
+            if ans == "1":
+                break
+            elif ans == "2":
+                print("Note that this will require your username and password. You will have to paste them here.")
+                print("First off is generating an API key for yourself.")
+                print("You will be redirected to a website, where you will create an API account.")
+                print("Just fill in the data. If you don't have a Callback URL or Application Homepage, you can leave those fields blank.")
+                print("Once your account is created, you'll get an API Key and Shared Secret, which you will paste here.")
+                input("Press Enter to open the Last.fm API website.")
+                webbrowser.open("https://www.last.fm/api/account/create")
+                print("")
+                apiKey = input("Paste your API Key here: ").strip()
+                shaSecret = input("Paste your Shared Secret here: ").strip()
+                username = input("Input your last.fm username (case sensitive): ").strip()
+                passwd = input("Input your last.fm password: ")
+                lastFmCreds = {"apikey": apiKey, "apisecret": shaSecret, "username": username, "password": passwd}
+                cE.writeIntoJson(lastFmCreds, "lastfmcreds.json")
+                break
+            else:
+                print("Invalid input.")
+    else:
+        print("Note that this will require your username and password. You will have to paste them here.")
+        print("First off is generating an API key for yourself.")
+        print("You will be redirected to a website, where you will create an API account.")
+        print("Just fill in the data. If you don't have a Callback URL or Application Homepage, you can leave those fields blank.")
+        print("Once your account is created, you'll get an API Key and Shared Secret, which you will paste here.")
+        input("Press Enter to open the Last.fm API website.")
+        webbrowser.open("https://www.last.fm/api/account/create")
+        print("")
+        apiKey = input("Paste your API Key here: ").strip()
+        shaSecret = input("Paste your Shared Secret here: ").strip()
+        username = input("Input your last.fm username (case sensitive): ").strip()
+        passwd = input("Input your last.fm password: ")
+        lastFmCreds = {"apikey": apiKey, "apisecret": shaSecret, "username": username, "password": passwd}
+        cE.writeIntoJson(lastFmCreds, "lastfmcreds.json")
     print("Done!")
     print("If you input the wrong thing, close the program and open it again.")
     print("")
