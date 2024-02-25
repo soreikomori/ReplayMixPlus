@@ -1,6 +1,6 @@
 """
 Replay Mix+ by soreikomori
-v1.0.0
+v1.1.0
 https://github.com/soreikomori/ReplayMixPlus
 """
 import importlib.metadata as metadata
@@ -8,13 +8,27 @@ import subprocess
 import sys
 import os
 import webbrowser
-import compendiumEngine as cE
+import json
 
-if cE.loadJson("config.json") == None:
+def loadJson(filename):
+    """
+    Loads a .json file.
+
+    :param filename: str with the json filename.
+    :return: The loaded .json, or None if it was empty (or threw an error).
+    """
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except json.decoder.JSONDecodeError as e:
+        return None
+
+if loadJson("config.json") == None:
     firstSetupDone = False
 else:
     firstSetupDone = True
     import generatorEngine as gE
+    import compendiumEngine as cE
 
 def initialize():
     """
@@ -63,7 +77,7 @@ def initialSetup():
     print("")
     print("Step 0: Packages")
     print("")
-    print("ReplayMix+ uses the pylast and ytmusicapi packages. They will be installed now.")
+    print("ReplayMix+ uses the pylast and ytmusicapi packages. They will be installed now. Press Enter after each installation.")
     print("")
     installPyPackage("pylast")
     installPyPackage("ytmusicapi")

@@ -1,6 +1,6 @@
 """
 Replay Mix+ by soreikomori
-v1.0.0
+v1.1.0
 https://github.com/soreikomori/ReplayMixPlus
 """
 from ytmusicapi import YTMusic

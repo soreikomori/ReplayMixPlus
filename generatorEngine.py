@@ -1,16 +1,13 @@
 """
 Replay Mix+ by soreikomori
-v1.0.0
+v1.1.0
 https://github.com/soreikomori/ReplayMixPlus
 """
-import importlib.metadata as metadata
 from ytmusicapi import YTMusic
 import time
 import pylast
 import json
-import subprocess
 import compendiumEngine as cE 
-import sys
 
 yt = YTMusic("oauth.json")
 
