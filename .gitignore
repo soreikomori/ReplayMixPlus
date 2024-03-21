@@ -1,2 +1,7 @@
 ReplayMixPlus.code-workspace
 __pycache__
+config.json
+oauth.json
+lastfmcreds.json
+ytm_compendium.json
+rpmplus.log

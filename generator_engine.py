@@ -1,14 +1,16 @@
+#!/usr/bin/env python3
 """
 Replay Mix+ by soreikomori
-v1.2.0
 https://github.com/soreikomori/ReplayMixPlus
 """
 from ytmusicapi import YTMusic
 import time
 import pylast
-import json
-import compendiumEngine as cE 
+import logging
+import json_tools as jt
 
+############### PRERUN FUNCTIONS ###############
+logger = logging.getLogger('rpmplusLogger')
 yt = YTMusic("oauth.json")
 
 ############### SETUP FUNCTIONS ###############
@@ -20,13 +22,13 @@ def lastFmNetworkConnect():
 
     Code inspired from @akraus53 on Github. Kudos!
     """
-    credFile = open('lastfmcreds.json', 'r')
-    lastFmCreds = json.loads(credFile.read())
-    credFile.close()
+    logger.info("Connecting to Last.FM Network...")
+    lastFmCreds = jt.loadJson("lastfmcreds.json")
     network = pylast.LastFMNetwork(api_key=lastFmCreds['apikey'], api_secret=lastFmCreds['apisecret'],
                                username=lastFmCreds['username'],
                                password_hash=pylast.md5(lastFmCreds['password']))
     userSelf = network.get_user(lastFmCreds['username'])
+    logger.info("Connected to Last.FM Network, returning UserSelf.")
     return userSelf
 
 ############### IMPORT AND FETCHES ###############
@@ -46,6 +48,7 @@ def fetchTopTracks(userSelf):
     # CHANGE THIS LINE -----
     limit = 100
     # ------------
+    logger.info("Fetching top tracks from Last.FM...")
     return userSelf.get_top_tracks(period=period,limit=limit)
 
 def fetchRecentTracks(userSelf):
@@ -58,6 +61,7 @@ def fetchRecentTracks(userSelf):
     """
     #So far, this only supports 7 days according to the calculation below. I plan to add more days at a later version if there is demand for other timeframes.
     sevenDaysAgo = round(time.time() - (7 * 24 * 60 * 60))
+    logger.info("Fetching recent tracks from Last.FM...")
     return userSelf.get_recent_tracks(time_from=sevenDaysAgo, limit=None)
 
 ############### MASTERLIST CREATION ###############
@@ -79,17 +83,19 @@ def createMasterList():
     uniqueIds = []
 
     # Engine
+    logger.info("Creating MasterList...")
     for track in topTracks:
         tiAsDict = track._asdict()
         scrobbles = tiAsDict["weight"]
         title = tiAsDict["item"].get_title()
+        logger.debug("MasterList - Processing track: " + title)
         artist = tiAsDict["item"].get_artist().get_name()
-        # Currently the value in "artist" has no use, but I still leave it to make the
-        # dictionary more understandable. Feel free to remove it from here and from checkYTMId().
+        # Currently the value in "artist" has no use, but I still leave it to make the dictionary more understandable. Feel free to remove it from here and from checkYTMId().
         lastPlayed = lastPlayedChecker(title, recentTracks)
         repetitions = repetitionChecker(title, recentTracks)
         score = calcScore(scrobbles, lastPlayed, repetitions, maxScrobbles, maxRepetitions)
         ytmId = checkYTMId(title, artist)
+        logger.debug("Track: " + title + " | Score: " + str(score))
 
         if ytmId != None and ytmId not in uniqueIds:
             uniqueIds.append(ytmId)
@@ -101,6 +107,7 @@ def createMasterList():
                 "score": score
             }
             masterList.append(trackDict)
+    logger.info("MasterList created.")
     return sorted(masterList, key=lambda x: x["score"], reverse=True)
 
 def checkYTMId(title, artist):
@@ -112,7 +119,7 @@ def checkYTMId(title, artist):
     :return: An str with the videoId for the track in the compendium.
         If it's not found, it returns None, which eventually results in the track simply not being included.
     """
-    compendium = cE.loadJson("ytm_compendium.json")
+    compendium = jt.loadJson("ytm_compendium.json")
     for track in compendium:
         """ NOTE The commented line below checks if a given artist exists in a YTM Track's "artists" value.
 
@@ -128,6 +135,7 @@ def checkYTMId(title, artist):
         if title.lower() == track["title"].lower():
             return track["videoId"]
     print("Could not find the track \"" + title + "\" in the Compendium.")
+    logger.error("Could not find the track \"" + title + "\" in the Compendium.")
     return None
 
 ############### SCORE CALCULATION ###############
@@ -203,14 +211,18 @@ def recreatePlaylist():
     This is the only function that this entire script needs to run to work independently, as it calls all other functions.
     It will work as long as a compendium exists, and the playlistId is set in config.json.
     """
-    playlistId = cE.loadJson("config.json")["ytPlaylistId"]
-    currentTracks = yt.get_playlist(playlistId, None).get("tracks")
+    logger.info("Playlist Recreation started.")
+    playlistId = jt.loadJson("config.json")["ytPlaylistId"]
+    currentTracks = yt.get_playlist(playlistId, None).get("tracks") # type: ignore
     videoIdList = []
     masterList = createMasterList()
     for track in masterList:
+        logger.debug("Playlist Recreation - Adding track " + track["title"] + " to the playlist.")
         videoIdList.append(track["ytmid"])
     if len(currentTracks) > 0:
+        logger.info("Removing current tracks from the playlist. (Playlist was not empty.)")
         yt.remove_playlist_items(playlistId, currentTracks)
+    logger.info("Adding new tracks to the playlist.")
     yt.add_playlist_items(playlistId, videoIdList)
 
 ############### CONSOLE HELPER FUNCTIONS ###############
