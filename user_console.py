@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
 Replay Mix+ by soreikomori
-v1.3.0
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.3.0"
+version = "1.3.1"
 import importlib.metadata as metadata
 import subprocess
 import sys

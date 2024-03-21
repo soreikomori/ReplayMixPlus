@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.3.0"
+version = "1.3.1"
 import importlib.metadata as metadata
 import subprocess
 import sys
@@ -50,11 +50,11 @@ def initialize():
     logging_setup.setup_logger(verbose)
     logger = logging.getLogger('rpmplusLogger')
     # Initialization
+    checkDependencies(logger)
     import generator_engine as gE
     import compendium_engine as cE
     logger.info(f"ReplayMix+ Automated Console {version}")
     logger.info("Checking dependencies...")
-    checkDependencies(logger)
     logger.info("Dependencies are installed.")
     if args.compendium:
         logger.info("Updating Compendium...")
