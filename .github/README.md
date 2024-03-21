@@ -10,13 +10,15 @@ ReplayMix+ is a playlist generator for YouTube Music inspired by the native Repl
 - One-click-run self-contained console for ease of use.
 
 ## Requirements
-Python 3.8 or higher. Your python **MUST** be an environment variable (be in PATH).
+Python 3.8 or higher. Your python **MUST** be an environment variable (be in PATH). You must also have pip installed (so the dependencies get installed by the script).
 
 ## Installation and Usage
 
 Download the latest release from the [releases page](https://github.com/soreikomori/ReplayMixPlus/releases), then unzip it wherever you want and execute `user_console.py`. This last file will also be your updater.
 
 If you want to run ReplayMix+ without input (automatically) whether using automation in your computer or in a server, you may use `automated_console.py`. Please do note that it's necessary to run the User Console first at least once so your last.fm and YTM credentials are generated accordingly.
+
+If you're installing on a server, it might be necessary to run `user_console.py` once on your regular computer and then transfer `config.json`, `lastfmcreds.json`, and `oauth.json` over, since `oauth.json` in particular requires a web browser to be generated. Once you have these 3 files and have transferred them over to your server, you can run `automated_console.py`.
 
 ### Automated Console Command Line Arguments
 - `-p` or `--playlist` updates the ReplayMix+ Playlist.
