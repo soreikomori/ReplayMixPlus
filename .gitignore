@@ -1,4 +1,5 @@
 ReplayMixPlus.code-workspace
+.vscode
 __pycache__
 config.json
 oauth.json
