@@ -14,7 +14,14 @@ Python 3.8 or higher. Your python **MUST** be an environment variable (be in PAT
 
 ## Installation and Usage
 
-Download the latest release from the [releases page](https://github.com/soreikomori/ReplayMixPlus/releases), then unzip it wherever you want and execute `ReplayMixPlusConsole.py`. This last file will also be your updater.
+Download the latest release from the [releases page](https://github.com/soreikomori/ReplayMixPlus/releases), then unzip it wherever you want and execute `user_console.py`. This last file will also be your updater.
+
+If you want to run ReplayMix+ without input (automatically) whether using automation in your computer or in a server, you may use `automated_console.py`. Please do note that it's necessary to run the User Console first at least once so your last.fm and YTM credentials are generated accordingly.
+
+### Automated Console Command Line Arguments
+- `-p` or `--playlist` updates the ReplayMix+ Playlist.
+- `-c` or `--compendium` updates the Compendium.
+- `-v` or `--verbose` enables verbose logging.
 
 ## FAQ and Common Errors
 
@@ -26,7 +33,7 @@ ReplayMix+ includes all tracks in your library, including uploaded tracks, unlik
 
 > **How often are playlists generated?**
 
-Playlists can be generated at any time by running the console application and updating them. There are no set intervals for playlist generation, however- the process is currently manual.
+Playlists can be generated at any time by running the console application and updating them. You can set up an automation script with something like AutoHotkey if you wish.
 
 > **How does ReplayMix+ determine the playlist order?**
 
@@ -54,7 +61,7 @@ It's the term I give a file called `ytm_compendium.json`. It pulls all of the tr
 
 > **How much space does this take up?**
 
-Everything except for the compendium doesn't take more than 200KB. The compendium is the heavy one, which depends on the amount of tracks on your playlists. It's somewhere around 1KB per track, maybe less. Mine has 16391 tracks and is around 7.6MB. So all in all not too much.
+Everything except for the compendium doesn't take more than 200KB. The compendium is the heavy one, which depends on the amount of tracks on your playlists. It's still relatively small. As an example, mine has 2511 tracks and has a size of 388KB.
 
 > **Will this work for tracks not in the latin alphabet?**
 
@@ -63,11 +70,11 @@ I haven't given it a try with every language, but I have some tracks in Japanese
 ### Errors
 > **I get an error on my browser when trying to register with Google!**
  
-This might happen depending on your browser or extensions. I use Firefox, for example, and it never works for some reason, so I just copy the URL to Edge instead. Some tracker removal extensions can also meddle with the process, so you might want to try disabling them for a bit.
+This might happen depending on your browser or extensions. I use Firefox, for example, and it never works for some reason, so I just copy the URL to Edge instead. Some tracker removal extensions can also meddle with the process, so you might want to try disabling them for a bit. Once the process is complete it should be saved in your `oauth.json`.
 
 > **The console won't open- it always crashes!**
 
-Try opening a .cmd (or terminal) first and execute it from there (type `ReplayMixPlusConsole.py` after you've navigated to the directory).
+Try opening a .cmd (or terminal) first and execute it from there (type `user_console.py` after you've navigated to the directory).
 
 > **I get "Could not find the track [track] in the Compendium.", what do I do?**
 
