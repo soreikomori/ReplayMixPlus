@@ -223,7 +223,14 @@ def recreatePlaylist():
         logger.info("Removing current tracks from the playlist. (Playlist was not empty.)")
         yt.remove_playlist_items(playlistId, currentTracks)
     logger.info("Adding new tracks to the playlist.")
-    yt.add_playlist_items(playlistId, videoIdList)
+    time.sleep(15)
+    currentTracks = yt.get_playlist(playlistId, None).get("tracks") # type: ignore
+    while len(currentTracks) == 0:
+        logger.error("Playlist is empty. Retrying...")
+        yt.add_playlist_items(playlistId, videoIdList)
+        time.sleep(15)
+        currentTracks = yt.get_playlist(playlistId, None).get("tracks")
+    logger.info("Playlist Recreation finished.")
 
 ############### CONSOLE HELPER FUNCTIONS ###############
 
