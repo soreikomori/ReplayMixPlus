@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.3.1"
+version = "1.3.2"
 import importlib.metadata as metadata
 import subprocess
 import sys
