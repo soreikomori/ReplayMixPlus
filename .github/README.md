@@ -4,15 +4,15 @@ ReplayMix+ is a playlist generator for YouTube Music inspired by the native Repl
 ![GitHub License](https://img.shields.io/github/license/soreikomori/ReplayMixPlus?color=%23ff0037)
 ![GitHub Release](https://img.shields.io/github/v/release/soreikomori/ReplayMixPlus?cacheSeconds=https%3A%2F%2Fgithub.com%2Fsoreikomori%2FReplayMixPlus%2Freleases%2Flatest)
 
-## Features
+## ⭐ Features
 - Generates a custom playlist based on your last 7 days of last.fm listening history, including uploaded tracks.
 - Organizes music based on listening frequency, recency, and loop count.
 - One-click-run self-contained console for ease of use.
 
-## Requirements
+## 💿 Requirements
 Python 3.8 or higher. Your python **MUST** be an environment variable (be in PATH). You must also have pip installed (so the dependencies get installed by the script).
 
-## Installation and Usage
+## 🎶 Installation and Usage
 
 Download the latest release from the [releases page](https://github.com/soreikomori/ReplayMixPlus/releases), then unzip it wherever you want and execute `user_console.py`. This last file will also be your updater.
 
@@ -25,7 +25,7 @@ If you're installing on a server, it might be necessary to run `user_console.py`
 - `-c` or `--compendium` updates the Compendium.
 - `-v` or `--verbose` enables verbose logging.
 
-## FAQ and Common Errors
+## 💡 FAQ and Common Errors
 
 ### Questions
 
@@ -55,7 +55,9 @@ No. ReplayMix+ uses a console-based interface for simplicity.
 
 > **Why do I have to input my last.fm password?**
 
-In order for the API to communicate with your last.fm and ask for data, it needs to authenticate that you're the one using it by using your password hashed with MD5. This means that, after you input it, it will be saved on lastfmcreds.json and will never leave your device- as pyLast will only communicate using the hashed version. 
+In order for the API to communicate with your last.fm and ask for data, it needs to authenticate that you're the one using it by using your password hashed with MD5. This means that, after you input it, a hashed version will be saved on lastfmcreds.json and will never leave your device- as pyLast will only communicate using the hashed version.
+
+That said, you should take care that the lastfmcreds.json file is not shared with anyone, as it will contain your API key and secret, as well as your hashed password.  
 
 > **What's the "Compendium"?**
 
@@ -63,11 +65,11 @@ It's the term I give a file called `ytm_compendium.json`. It pulls all of the tr
 
 > **How much space does this take up?**
 
-Everything except for the compendium doesn't take more than 200KB. The compendium is the heavy one, which depends on the amount of tracks on your playlists. It's still relatively small. As an example, mine has 2511 tracks and has a size of 388KB.
+Everything except for the compendium doesn't take more than 200KB. The compendium is the heavy one, which depends on the amount of tracks on your playlists. It's still relatively small. As an example, mine has 3156 tracks and has a size of 491KB.
 
 > **Will this work for tracks not in the latin alphabet?**
 
-I haven't given it a try with every language, but I have some tracks in Japanese and Russian (Cyrillic) and it works. It's probably compatible with anything utf-8, but I don't know enough about Unicode stuffs to say for sure.
+I haven't given it a try with every language, but I have some tracks in Japanese and Russian (Cyrillic) and it works just fine. Make sure your system is set to UTF-8 encoding.
 
 ### Errors
 > **I get an error on my browser when trying to register with Google!**
@@ -107,17 +109,20 @@ Now the title has been fixed and it shows up very well on my last.fm, also reduc
 Do note, however, that if you do this, you won't be adding views to the original video anymore, which could hurt the artist. (In my case, I am subscribed to this artist's patreon and was able to download the song as a reward)
 
 The solution then is storing these edits within ReplayMix+, something that I am planning to work on if there is a demand for it. If you feel like you need this, feel free to tell me on an issue and I will try to work on an idea. You could also help with a pull request if you're eager.
-## Contribution
+## ⛏️ Contribution
 
 Feel free to make a pull request with anything you like. I'll take a look at some point. If you want to get more hands on with the project, contact `soreikomori` on Discord.
 
-## Acknowledgements
+## 👥 Acknowledgements
 
 This code uses [pyLast](https://github.com/pylast/pylast) and [ytmusicapi](https://github.com/sigma67/ytmusicapi). If it weren't for these two, I would still be dreaming of this.
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details. Note that pylast uses the Apache 2.0 license, also included [in their repo](https://github.com/pylast/pylast/blob/main/LICENSE.txt).
 
-## Disclaimer
+## ❤️ Donations
+ReplayMix+ will always be fully free and open source, and there will never be any features locked behind paywalls. However, if you want to support me and my projects, you can donate to my [Ko-fi](https://ko-fi.com/soreikomori). I appreciate every donation, no matter the amount!
+
+## ℹ️ Disclaimer
 This project is not affiliated with or endorsed by YouTube Music.
