@@ -6,3 +6,4 @@ oauth.json
 lastfmcreds.json
 ytm_compendium.json
 rpmplus.log
+.gitignore
