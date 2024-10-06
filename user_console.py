@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.3.2"
+version = "1.4.0"
 import importlib.metadata as metadata
 import subprocess
 import sys
@@ -17,13 +17,25 @@ import json_tools as jt
 # LOGGING SETUP
 logging_setup.setup_logger(False)
 logger = logging.getLogger('rpmplusLogger')
-            
+# INITIAL SETUP CHECKER
 if jt.loadJson("config.json") == None or len(jt.loadJson("config.json")) == 0:
     firstSetupDone = False
 else:
     firstSetupDone = True
     import generator_engine as gE
     import compendium_engine as cE
+# PACKAGE CHECKER
+if firstSetupDone:
+    for package in ["pylast", "ytmusicapi"]:
+        try:
+            metadata.version(package)
+        except metadata.PackageNotFoundError:
+            confirmation = input(f"{package} is not installed. Would you like to install it? (y/n)")
+            if confirmation.lower() == "y":
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
+            else:
+                print("Please install the required packages before running the program.")
+                exit()
 
 def initialize():
     """
@@ -124,12 +136,12 @@ def initialSetup():
             if ans == "1":
                 break
             elif ans == "2":
-                lastfmIsAuthenticate(cE)
+                lastfmIsAuthenticate()
                 break
             else:
                 print("Invalid input.")
     else:
-        lastfmIsAuthenticate(cE)
+        lastfmIsAuthenticate()
     logger.info("last.fm authentication complete.")
     print("Done!")
     print("If you think you put in the wrong thing, close the program and open it again.")
@@ -222,17 +234,16 @@ def ytmIsAuthenticate():
                     break
                 elif ans == "2":
                     logger.info("User chose to close the console.")
-                    logger.info("Exiting program at YTM Authetnication failure.")
+                    logger.info("Exiting program at YTM Authentication failure.")
                     exit()
                 else:
                     print("Invalid input.")
 
-def lastfmIsAuthenticate(cE):
+def lastfmIsAuthenticate():
     """
     Authenticates lastfm in the initial setup. This is a separate function because it's used twice. It also checks if the authentication was successful.
-
-    :param cE: The compendium engine object.
     """
+    import pylast
     logger.info("Last.fm authentication process started.")
     print("Note that this will require your username and password. You will have to paste them here.")
     print("First off is generating an API key for yourself.")
@@ -247,7 +258,7 @@ def lastfmIsAuthenticate(cE):
     username = input("Input your last.fm username (case sensitive): ").strip()
     passwd = getpass.getpass("Input your last.fm password: ")
     logger.info("Last.fm Auth details written to lastfmcreds.json.")
-    lastFmCreds = {"apikey": apiKey, "apisecret": shaSecret, "username": username, "password": passwd}
+    lastFmCreds = {"apikey": apiKey, "apisecret": shaSecret, "username": username, "password": pylast.md5(passwd)}
     jt.writeIntoJson(lastFmCreds, "lastfmcreds.json")
 
 def update():
@@ -312,7 +323,10 @@ def installPyPackage(packageName):
     """
     Installs a python package to the user's python environment. Used for pyLast and ytmusicapi.
 
-    :param packageName: The name of the package to be installed.
+    Parameters
+    ----------
+    packageName : str
+        The name of the package to be installed.
     """
     try:
         metadata.version(packageName)
