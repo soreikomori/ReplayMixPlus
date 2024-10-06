@@ -13,10 +13,17 @@ def removeDuplicates(playlist, compendium):
     Checks a compendium and the tracks in a playlist and adds non-duplicate tracks to it.
     To work correctly, this function needs to receive a PURGED playlist.
 
-    :param playlist: A purged playlist with ytmusicapi tracks (dictionaries).
-    :param compendium: a compendium (list) usually fetched from ytm_compendium.json.
-    :return: The updated compendium with new tracks added.
-
+    Parameters
+    ----------
+    playlist : list
+        A purged playlist with ytmusicapi tracks (dictionaries).
+    compendium : list
+        A compendium (list) usually fetched from ytm_compendium.json.
+    
+    Returns
+    -------
+    list
+        The updated compendium with new tracks added.
     """
     for track in playlist:
         logger.debug("Duplicate Remover - Checking track " + track["title"])
@@ -52,7 +59,15 @@ def purgeFetchedPlaylist(playlist):
     """
     Removes all track data except videoId, title, and artists for each track in a playlist.
 
-    :param playlist: A playlist (dict) fetched from ytmusicapi.
+    Parameters
+    ----------
+    playlist : dict
+        A playlist fetched from ytmusicapi.
+    
+    Returns
+    -------
+    list
+        A purged playlist.
     """
     purgedPlaylist = []
     logger.debug("Purging playlist...")

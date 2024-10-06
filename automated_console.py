@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.3.2"
+version = "1.4.0"
 import importlib.metadata as metadata
 import subprocess
 import sys
@@ -18,7 +18,10 @@ def checkDependencies(logger):
     Checks if the dependencies are installed.
     If not found, it will attempt to install them.
 
-    :param logger: The logger object.
+    Parameters
+    ----------
+    logger : logging.Logger
+        The logger object.
     """
     logger.info("Checking dependencies...")
     try:

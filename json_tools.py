@@ -12,8 +12,12 @@ def writeIntoJson(content, filename):
     """
     Writes into a .json file.
 
-    :param content: Whatever that is supposed to be written. In this program's context this is either a dict or a list.
-    :param filename: str with the json filename.
+    Parameters
+    ----------
+    content : dict or list
+        Whatever that is supposed to be written. In this program's context this is either a dict or a list.
+    filename : str
+        The json filename.
     """
     with open(filename, 'w') as file:
         logger.info("Wrote into " + filename)
@@ -23,10 +27,15 @@ def loadJson(filename):
     """
     Loads a .json file.
 
-    :param filename: str with the json filename.
-
-    :return: Returns the loaded .json if the file was found and filled, an empty dictionary if the file was found but empty,
-             and None if the file was not found.
+    Parameters
+    ----------
+    filename : str
+        The json filename.
+    
+    Returns
+    -------
+    dict or None
+        The loaded .json file. None if the file was not found.
     """
     try:
         with open(filename, 'r') as file:
@@ -44,7 +53,10 @@ def createJson(filename):
     """
     Creates an empty .json file with the name given. If the file already exists, it does nothing.
 
-    :param filename: str with the json filename.
+    Parameters
+    ----------
+    filename : str
+        The json filename.
     """
     if not os.path.exists(filename):
         with open(filename, 'w') as json_file:

@@ -8,7 +8,10 @@ def setup_logger(verbose):
     """
     Sets up the logger for the program.
 
-    :param verbose: A boolean that determines if the logger will be verbose.
+    Parameters
+    ----------
+    verbose : bool
+        A boolean that determines if the logger will be verbose.
     """
     logger = logging.getLogger("rpmplusLogger")
     logger.setLevel(logging.DEBUG if verbose else logging.INFO)
