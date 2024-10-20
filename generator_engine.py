@@ -52,11 +52,7 @@ def fetchTopTracks(userSelf):
     # NOTES FOR PERIOD
     # Accepted values: overall | 7day | 1month | 3month | 6month | 12month
     period = "7day"
-    #### PLAYLIST SIZE
-    # You can change this if you want your playlist to be bigger or smaller.
-    # CHANGE THIS LINE -----
-    limit = 100
-    # ------------
+    limit = 200
     logger.info("Fetching top tracks from Last.FM...")
     return userSelf.get_top_tracks(period=period,limit=limit)
 
@@ -107,7 +103,7 @@ def createMasterList():
         tiAsDict = track._asdict()
         scrobbles = tiAsDict["weight"]
         title = tiAsDict["item"].get_title()
-        logger.debug("MasterList - Processing track: " + title)
+        logger.debug(f"MASTERLIST - Processing last.fm track \"{title}\"")
         artist = tiAsDict["item"].get_artist().get_name()
         # Currently the value in "artist" has no use, but I still leave it to make the dictionary more understandable. Feel free to remove it from here and from checkYTMId().
         lastPlayed = lastPlayedChecker(title, recentTracks)
@@ -126,6 +122,16 @@ def createMasterList():
                 "score": score
             }
             masterList.append(trackDict)
+        #### PLAYLIST SIZE
+        # You can change this if you want your playlist to be bigger or smaller.
+        # CHANGE THIS LINE -----
+        if len(masterList) == 100:
+            break
+        # ---------------------
+    logger.debug("MASTERLIST:")
+    for track in masterList:
+        logger.debug("Track fm Title: " + track["title"] + " | Score: " + str(track["score"]))
+    logger.debug("-----------------")
     logger.info("MasterList created.")
     return sorted(masterList, key=lambda x: x["score"], reverse=True)
 
@@ -158,9 +164,13 @@ def checkYTMId(title, artist):
         same name) then maybe this can help you.
         """
         # artistPresent = any(artist == artists['name'] for artists in track.get('artists', []))
-        if title.lower() == track["title"].lower():
+        compendiumTitle = track["title"].lower()
+        noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower()
+        if title.lower() == compendiumTitle or title.lower() == noFeatureTitle:
+            if title.lower() != compendiumTitle:
+                logger.debug("NOTE - Track matched by title without (feat.)")
+                logger.debug(f"fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
             return track["videoId"]
-    print("Could not find the track \"" + title + "\" in the Compendium.")
     logger.error("Could not find the track \"" + title + "\" in the Compendium.")
     return None
 
