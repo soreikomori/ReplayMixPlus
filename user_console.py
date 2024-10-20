@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.4.0"
+version = "1.5.0"
 import importlib.metadata as metadata
 import subprocess
 import sys
@@ -15,6 +15,7 @@ import getpass
 import json_tools as jt
 
 # LOGGING SETUP
+# Change the False to True if you want verbose debug logging.
 logging_setup.setup_logger(False)
 logger = logging.getLogger('rpmplusLogger')
 # INITIAL SETUP CHECKER

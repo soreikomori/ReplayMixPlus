@@ -3,14 +3,13 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.4.0"
+version = "1.5.0"
 import importlib.metadata as metadata
 import subprocess
 import sys
 import argparse
 import logging_setup
 import logging
-# LOGGING SETUP
 
 # DEPENDENCY CHECK
 def checkDependencies(logger):
@@ -47,6 +46,7 @@ def initialize():
     parser.add_argument("-vb", "--verbose", action="store_true", help="Enables verbose logging.")
     args = parser.parse_args()
     # Logging Setup
+    # Change the False to True if you want verbose debug logging.
     verbose = False
     if args.verbose:
         verbose = True
