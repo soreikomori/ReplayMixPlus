@@ -266,6 +266,7 @@ def ytmIsAuthenticate():
                 with open("headers.txt", "r") as headersFile:
                     rawHeaders = headersFile.read()
                 ytmusicapi.setup(filepath="auth.json", headers_raw=rawHeaders)
+                os.remove("headers.txt")
                 break
             else:
                 print("Invalid input. Please try again.")
