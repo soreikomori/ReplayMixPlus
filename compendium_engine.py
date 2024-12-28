@@ -40,7 +40,7 @@ def loadAllPlaylists():
     if compendium == None:
         logger.info("Compendium was empty.")
         compendium = []
-    yt = YTMusic("oauth.json")
+    yt = YTMusic("auth.json")
     history = purgeFetchedPlaylist(yt.get_history())
     playlists = yt.get_library_playlists()
     logger.info("Loading playlists into compendium...")
@@ -50,10 +50,10 @@ def loadAllPlaylists():
         purgedPls = purgeFetchedPlaylist(yt.get_playlist(id, None)["tracks"]) # type: ignore
         logger.debug("Playlist fetched and purged.")
         compendium = removeDuplicates(purgedPls, compendium)
-    removeDuplicates(history, compendium)
+    compendium = removeDuplicates(history, compendium)
     resetCompendium()
-    logger.info("Compendium updated.")
     jt.writeIntoJson(compendium, "ytm_compendium.json")
+    logger.info("Compendium updated.")
 
 def purgeFetchedPlaylist(playlist):
     """
