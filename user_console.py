@@ -7,12 +7,21 @@ version = "1.5.0"
 # PACKAGE CHECKER
 import subprocess
 import sys
-import importlib.metadata as metadata
-for package in ["pylast", "ytmusicapi", "rapidfuzz"]:
-    try:
-        metadata.version(package)
-    except metadata.PackageNotFoundError:
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
+import pkg_resources
+def checkDependencies(requirements_file):
+    with open(requirements_file, 'r') as file:
+        requirements = pkg_resources.parse_requirements(file)
+        for requirement in requirements:
+            try:
+                pkg_resources.require(str(requirement))
+            except pkg_resources.DistributionNotFound:
+                return False  # A dependency is missing
+            except pkg_resources.VersionConflict:
+                return False  # Version conflict exists
+    return True
+if not checkDependencies("requirements.txt"):
+    print("Some dependencies are missing. Installing them now.")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 # IMPORTS
 import os
 import webbrowser
@@ -351,22 +360,4 @@ def update():
         else:
             print("Invalid input.")
             repMenu = False
-
-def installPyPackage(packageName):
-    """
-    Installs a python package to the user's python environment. Used for pyLast and ytmusicapi.
-
-    Parameters
-    ----------
-    packageName : str
-        The name of the package to be installed.
-    """
-    try:
-        metadata.version(packageName)
-        print(packageName + " is already installed.")
-        logger.info(packageName + " is already installed.")
-    except metadata.PackageNotFoundError:
-        logger.error(packageName + " not found. Installing...")
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', packageName])
-        print(packageName + " has been successfully installed.")
 initialize()
