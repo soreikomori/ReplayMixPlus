@@ -3,7 +3,11 @@ ReplayMixPlus.code-workspace
 __pycache__
 config.json
 oauth.json
+browser.json
+auth.json
+headers.txt
 lastfmcreds.json
 ytm_compendium.json
 rpmplus.log
 .gitignore
+.venv

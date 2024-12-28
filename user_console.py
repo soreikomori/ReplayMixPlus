@@ -3,10 +3,26 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.5.0"
-import importlib.metadata as metadata
+version = "1.6.0"
+# PACKAGE CHECKER
 import subprocess
 import sys
+import pkg_resources
+def checkDependencies(requirements_file):
+    with open(requirements_file, 'r') as file:
+        requirements = pkg_resources.parse_requirements(file)
+        for requirement in requirements:
+            try:
+                pkg_resources.require(str(requirement))
+            except pkg_resources.DistributionNotFound:
+                return False  # A dependency is missing
+            except pkg_resources.VersionConflict:
+                return False  # Version conflict exists
+    return True
+if not checkDependencies("requirements.txt"):
+    print("Some dependencies are missing. Installing them now.")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+# IMPORTS
 import os
 import webbrowser
 import logging_setup
@@ -14,29 +30,19 @@ import logging
 import getpass
 import json_tools as jt
 
-# LOGGING SETUP
-# Change the False to True if you want verbose debug logging.
-logging_setup.setup_logger(False)
-logger = logging.getLogger('rpmplusLogger')
 # INITIAL SETUP CHECKER
-if jt.loadJson("config.json") == None or len(jt.loadJson("config.json")) == 0:
+config = jt.loadJson("config.json")
+if config == None or len(config) == 0:
     firstSetupDone = False
 else:
     firstSetupDone = True
     import generator_engine as gE
     import compendium_engine as cE
-# PACKAGE CHECKER
-if firstSetupDone:
-    for package in ["pylast", "ytmusicapi"]:
-        try:
-            metadata.version(package)
-        except metadata.PackageNotFoundError:
-            confirmation = input(f"{package} is not installed. Would you like to install it? (y/n)")
-            if confirmation.lower() == "y":
-                subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
-            else:
-                print("Please install the required packages before running the program.")
-                exit()
+
+# LOGGING SETUP
+# Change the False to True if you want verbose debug logging.
+logging_setup.setup_logger(config["debug_logging"] if firstSetupDone else False)
+logger = logging.getLogger('rpmplusLogger')
 
 def initialize():
     """
@@ -86,26 +92,15 @@ def initialSetup():
     print("------------")
     print("INITIAL SETUP")
     print("")
-    logger.info("Initial Setup Step 0: Packages")
-    print("Step 0: Packages")
-    print("")
-    print("ReplayMix+ uses the pylast and ytmusicapi packages. They will be installed now. Press Enter after each installation.")
-    print("")
-    logger.info("Installing Dependencies...")
-    installPyPackage("pylast")
-    installPyPackage("ytmusicapi")
-    print("")
-    print("------------")
     logger.info("Initial Setup Step 1: Credentials")
     print("Step 1: Credentials")
     print("")
     print("In order to fetch data from both YouTube Music and last.fm, you will need to authenticate yourself in their websites.")
-    print("Let's begin with YouTube Music, which uses oauth.")
+    print("Let's begin with YouTube Music.")
     logger.info("YTM Authetication process started.")
-    logger.info("Attempting to create oauth.json...")
-    jt.createJson("oauth.json")
-    if jt.loadJson("oauth.json") != None and len(jt.loadJson("oauth.json")) != 0:
-        logger.error("YTM's oauth.json is not empty. Prompting user to skip or reauthenticate.")
+    logger.info("Attempting to create auth.json...")
+    if jt.loadJson("auth.json") != None and len(jt.loadJson("auth.json")) != 0:
+        logger.error("YTM's auth.json is not empty. Prompting user to skip or reauthenticate.")
         print("")
         print("Oh, it looks like you already have credentials- If you're repeating the initial setup and want to skip this step, type 1 then Enter.")
         print("If you want to authenticate again, type 2 then Enter.")
@@ -121,6 +116,7 @@ def initialSetup():
     else:
         ytmIsAuthenticate()
     logger.info("YTM authentication complete.")
+    print("Done!")
     import generator_engine as gE
     import compendium_engine as cE
     print("Now we authenticate last.fm.")
@@ -173,7 +169,7 @@ def initialSetup():
             logger.info("Playlist created successfully.")
             logger.info("Attempting to create config.json...")
             jt.createJson("config.json")
-            jt.writeIntoJson({"ytPlaylistId": playlistId}, "config.json")
+            jt.writeIntoJson({"ytPlaylistId": playlistId, "debug_logging": False}, "config.json")
             succeeded = True
         except Exception as e:
             print("Something went wrong. You might want to try with a different name and/or description.")
@@ -214,31 +210,76 @@ def initialSetup():
 
 def ytmIsAuthenticate():
     """
-    Authenticates YTM in the initial setup. This is a separate function because it's used twice. It also checks if the authentication was successful.
+    Authenticates YTM in the initial setup. It prompts the user to choose between oauth and browser authentication, then guides them through the process.
     """
-    while True:
-        logger.info("YTM authentication process started.")
-        print("A new terminal window will open, which will prompt you to connect your Google account to an API.")
-        print("Make sure to choose the right account that has your YTM library.")
-        input("Press Enter to continue...")
-        os.system("ytmusicapi oauth")
-        print("")
-        input("Once the authentication is done (you see a \"RefreshingToken\" response above), press Enter again.")
-        print("")
-        if len(jt.loadJson("oauth.json")) == 0:
+    import ytmusicapi
+    from ytmusicapi import YTMusic
+    def authVerified(first):
+        if first:
+            return False
+        if jt.loadJson("auth.json") == None or len(jt.loadJson("auth.json")) == 0:
             logger.error("YTM authentication failed.")
-            print("Something went wrong- The credentials didn't save.")
-            ans = input("Do you want to try again? Type 1 then Enter to try again, or 2 then Enter to close the console.")
-            while True:
-                if ans == "1":
-                    logger.info("Retrying YTM authentication.")
-                    break
-                elif ans == "2":
-                    logger.info("User chose to close the console.")
-                    logger.info("Exiting program at YTM Authentication failure.")
-                    exit()
-                else:
-                    print("Invalid input.")
+            print("Something went wrong- The auth didn't save. Let's try again.")
+            return False
+        else:
+            yt = YTMusic("auth.json")
+            try:
+                yt.get_account_info()
+                return True
+            except Exception as e:
+                logger.error("YTM authentication failed.")
+                print("Something went wrong. Let's try again.")
+                return False
+    logger.info("YTM authentication process started.")
+    print("As of November 2024, Google has made its oauth proccess notoriously harder to use.")
+    print("As such, you can choose whether you want to use oauth or browser authentication.")
+    print("")
+    print("OAUTH:")
+    print("Oauth uses the YouTube Data API. To use it, you'd need to create a Google Cloud Console account and project.")
+    print("I'd recommend it if you already have one of these, or if you're planning to use the API for other things.")
+    print("")
+    print("BROWSER:")
+    print("Browser authentication uses your cookies to authenticate.")
+    print("This method remains effective until you log out from wherever you got the cookies from (or after 2 years).")
+    print("Additionally, it requires you to do some manual work in your browser.")
+    print("I'd recommend it if you don't want to deal with the API, or if you don't have a Google Cloud Console account.")
+    print("")
+    print("Both methods have detailed instructions that will be opened in your browser.")
+    first = True
+    while not authVerified(first):
+        first = False
+        print("Which method would you like to use?")
+        print("1 - Oauth")
+        print("2 - Browser")
+        print("Enter a number then press enter.")
+        inputMethod = input("")
+        while True:
+            if inputMethod == "1":
+                webbrowser.open("https://ytmusicapi.readthedocs.io/en/stable/setup/oauth.html")
+                print("A new tab has opened on your browser. Read the instructions carefully.")
+                print("Note that you don't need to \"call ytmusicapi oauth\", that is done for you here.")
+                print("Once you're done getting the credentials, come back here and press Enter.")
+                input("Press Enter to continue...")
+                print("Done.")
+                os.rename("oauth.json", "auth.json")
+                break
+            elif inputMethod == "2":
+                webbrowser.open("https://ytmusicapi.readthedocs.io/en/stable/setup/browser.html")
+                print("A new tab has opened on your browser. Read the instructions under \"Copy Authentication Headers\" carefully.")
+                print("Note that you only need to copy the headers. Don't worry about the rest.")
+                with open("headers.txt", "w") as headersFile:
+                    headersFile.write("")
+                print("I've created a file named \"headers.txt\". Paste the cookie headers there, then save the file.")
+                print("Once you're done, come back here and press Enter.")
+                input("Press Enter to continue...")
+                with open("headers.txt", "r") as headersFile:
+                    rawHeaders = headersFile.read()
+                ytmusicapi.setup(filepath="auth.json", headers_raw=rawHeaders)
+                os.remove("headers.txt")
+                break
+            else:
+                print("Invalid input. Please try again.")
+                break
 
 def lastfmIsAuthenticate():
     """
@@ -319,22 +360,4 @@ def update():
         else:
             print("Invalid input.")
             repMenu = False
-
-def installPyPackage(packageName):
-    """
-    Installs a python package to the user's python environment. Used for pyLast and ytmusicapi.
-
-    Parameters
-    ----------
-    packageName : str
-        The name of the package to be installed.
-    """
-    try:
-        metadata.version(packageName)
-        print(packageName + " is already installed.")
-        logger.info(packageName + " is already installed.")
-    except metadata.PackageNotFoundError:
-        logger.error(packageName + " not found. Installing...")
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', packageName])
-        print(packageName + " has been successfully installed.")
 initialize()

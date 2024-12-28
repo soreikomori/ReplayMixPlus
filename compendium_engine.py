@@ -25,10 +25,21 @@ def removeDuplicates(playlist, compendium):
     list
         The updated compendium with new tracks added.
     """
+    avoidDifVerDupes = jt.loadJson("config.json")["avoid_different_version_duplicates"]
     for track in playlist:
         logger.debug("Duplicate Remover - Checking track " + track["title"])
         if track not in compendium:
-            compendium.append(track)
+            if avoidDifVerDupes:
+                for compTrack in compendium:
+                    # Same Track, different ID (different album version)
+                    if track["title"] == compTrack["title"] and track["videoId"] != compTrack["videoId"]:
+                        # Same artists
+                        if sorted(artist["name"] for artist in track["artists"]) == sorted(artist["name"] for artist in compTrack["artists"]):
+                            logger.info("Duplicate found. Skipping.")
+                else:
+                    compendium.append(track)
+            else:
+                compendium.append(track)
     return compendium
 
 def loadAllPlaylists():
@@ -40,7 +51,7 @@ def loadAllPlaylists():
     if compendium == None:
         logger.info("Compendium was empty.")
         compendium = []
-    yt = YTMusic("oauth.json")
+    yt = YTMusic("auth.json")
     history = purgeFetchedPlaylist(yt.get_history())
     playlists = yt.get_library_playlists()
     logger.info("Loading playlists into compendium...")
@@ -50,10 +61,10 @@ def loadAllPlaylists():
         purgedPls = purgeFetchedPlaylist(yt.get_playlist(id, None)["tracks"]) # type: ignore
         logger.debug("Playlist fetched and purged.")
         compendium = removeDuplicates(purgedPls, compendium)
-    removeDuplicates(history, compendium)
+    compendium = removeDuplicates(history, compendium)
     resetCompendium()
-    logger.info("Compendium updated.")
     jt.writeIntoJson(compendium, "ytm_compendium.json")
+    logger.info("Compendium updated.")
 
 def purgeFetchedPlaylist(playlist):
     """

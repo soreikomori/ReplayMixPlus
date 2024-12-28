@@ -8,10 +8,12 @@ import time
 import pylast
 import logging
 import json_tools as jt
+from rapidfuzz import fuzz
+import re
 
 ############### PRERUN FUNCTIONS ###############
 logger = logging.getLogger('rpmplusLogger')
-yt = YTMusic("oauth.json")
+yt = YTMusic("auth.json")
 
 ############### SETUP FUNCTIONS ###############
 def lastFmNetworkConnect():
@@ -103,9 +105,8 @@ def createMasterList():
         tiAsDict = track._asdict()
         scrobbles = tiAsDict["weight"]
         title = tiAsDict["item"].get_title()
-        logger.debug(f"MASTERLIST - Processing last.fm track \"{title}\"")
         artist = tiAsDict["item"].get_artist().get_name()
-        # Currently the value in "artist" has no use, but I still leave it to make the dictionary more understandable. Feel free to remove it from here and from checkYTMId().
+        logger.debug(f"MASTERLIST - Processing last.fm track \"{title}\" with artist \"{artist}\"")
         lastPlayed = lastPlayedChecker(title, recentTracks)
         repetitions = repetitionChecker(title, recentTracks)
         score = calcScore(scrobbles, lastPlayed, repetitions, maxScrobbles, maxRepetitions)
@@ -135,7 +136,7 @@ def createMasterList():
     logger.info("MasterList created.")
     return sorted(masterList, key=lambda x: x["score"], reverse=True)
 
-def checkYTMId(title, artist):
+def checkYTMId(title, artistParam):
     """
     Does a cross-check between last.fm and YTM to find the YTM ID of the specific track to be added to the playlist.
 
@@ -151,26 +152,30 @@ def checkYTMId(title, artist):
     str or None
         The videoId of the track in the compendium. None if the track is not found.
     """
+    artistSimThreshold = 80
+    titleSimThreshold = 90
+    separators = ["&", "and", ","]
     compendium = jt.loadJson("ytm_compendium.json")
+    logger.debug(f"Checking YTM ID for \"{title}\" with artist \"{artistParam}\"")
     for track in compendium:
-        """ NOTE The commented line below checks if a given artist exists in a YTM Track's "artists" value.
-
-        It's currently unused because artists between YTM and last.fm are a lot more
-        prone to errors unlike titles (especially when working with multiple artists)
-        and thus I decided to not use it.
-
-        If you're looking at my code and want to add more verifications for each track to make
-        sure the program gets the right one (for example if you have multiple tracks with the
-        same name) then maybe this can help you.
-        """
-        # artistPresent = any(artist == artists['name'] for artists in track.get('artists', []))
         compendiumTitle = track["title"].lower()
         noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower()
-        if title.lower() == compendiumTitle or title.lower() == noFeatureTitle:
-            if title.lower() != compendiumTitle:
-                logger.debug("NOTE - Track matched by title without (feat.)")
-                logger.debug(f"fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
-            return track["videoId"]
+        if fuzz.ratio(title.lower(), compendiumTitle) > titleSimThreshold or fuzz.ratio(title.lower(), noFeatureTitle) > titleSimThreshold:
+            compendiumArtists = track.get('artists', [])
+            # Logic for multiple artists in singular artist key
+            if len(compendiumArtists) == 1 and any(separator in compendiumArtists[0]["name"] for separator in separators):
+                splitName = re.split('&|and|,', compendiumArtists[0]["name"])
+                compendiumArtists = [{"name": name.strip(), "id": None} for name in splitName]
+                logger.debug(f"Found singular artist with multiple names, splitted: {compendiumArtists}")
+            for artistListed in compendiumArtists:
+                # Logic for multiple artists in lastfm
+                artistParamSplitted = re.split('&|and|,', artistParam)
+                matchedArtistSplitted = any(fuzz.ratio(artistParamSplit.lower().strip(), artistListed['name'].lower()) > artistSimThreshold for artistParamSplit in artistParamSplitted)
+                # Logic for single artist in lastfm
+                matchedArtistNoSplit = fuzz.ratio(artistParam.lower(), artistListed['name'].lower()) > artistSimThreshold
+                if matchedArtistSplitted or matchedArtistNoSplit:
+                    logger.debug(f"Match found! fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
+                    return track["videoId"]
     logger.error("Could not find the track \"" + title + "\" in the Compendium.")
     return None
 

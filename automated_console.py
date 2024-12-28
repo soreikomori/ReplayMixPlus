@@ -3,8 +3,8 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.5.0"
-import importlib.metadata as metadata
+version = "1.6.0"
+import pkg_resources
 import subprocess
 import sys
 import argparse
@@ -22,18 +22,19 @@ def checkDependencies(logger):
     logger : logging.Logger
         The logger object.
     """
-    logger.info("Checking dependencies...")
-    try:
-        metadata.version("ytmusicapi")
-    except metadata.PackageNotFoundError:
-        logger.error("ytmusicapi not found. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "ytmusicapi"])
-    try:
-        metadata.version("pylast")
-    except metadata.PackageNotFoundError:
-        logger.error("pylast not found. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pylast"])
-    logger.info("Dependencies are installed.")
+    valid = True
+    with open("requirements.txt", 'r') as file:
+        requirements = pkg_resources.parse_requirements(file)
+        for requirement in requirements:
+            try:
+                pkg_resources.require(str(requirement))
+            except pkg_resources.DistributionNotFound:
+                valid = False  # A dependency is missing
+            except pkg_resources.VersionConflict:
+                valid = False  # Version conflict exists
+    if not valid:
+        logger.error("One or more dependencies are missing. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
 def initialize():
     """
