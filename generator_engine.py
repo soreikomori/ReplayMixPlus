@@ -285,8 +285,6 @@ def recreatePlaylist():
     for track in masterList:
         logger.debug("Playlist Recreation - Adding track " + track["title"] + " to the playlist.")
         videoIdList.append(track["ytmid"])
-    # REMOVE
-    return
     if len(currentTracks) > 0:
         logger.info("Removing current tracks from the playlist. (Playlist was not empty.)")
         yt.remove_playlist_items(playlistId, currentTracks)
