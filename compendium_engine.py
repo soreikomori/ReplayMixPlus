@@ -25,10 +25,21 @@ def removeDuplicates(playlist, compendium):
     list
         The updated compendium with new tracks added.
     """
+    avoidDifVerDupes = jt.loadJson("config.json")["avoid_different_version_duplicates"]
     for track in playlist:
         logger.debug("Duplicate Remover - Checking track " + track["title"])
         if track not in compendium:
-            compendium.append(track)
+            if avoidDifVerDupes:
+                for compTrack in compendium:
+                    # Same Track, different ID (different album version)
+                    if track["title"] == compTrack["title"] and track["videoId"] != compTrack["videoId"]:
+                        # Same artists
+                        if sorted(artist["name"] for artist in track["artists"]) == sorted(artist["name"] for artist in compTrack["artists"]):
+                            logger.info("Duplicate found. Skipping.")
+                else:
+                    compendium.append(track)
+            else:
+                compendium.append(track)
     return compendium
 
 def loadAllPlaylists():
