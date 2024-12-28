@@ -9,10 +9,11 @@ import pylast
 import logging
 import json_tools as jt
 from rapidfuzz import fuzz
+import re
 
 ############### PRERUN FUNCTIONS ###############
 logger = logging.getLogger('rpmplusLogger')
-yt = YTMusic("oauth.json")
+yt = YTMusic("auth.json")
 
 ############### SETUP FUNCTIONS ###############
 def lastFmNetworkConnect():
@@ -151,26 +152,27 @@ def checkYTMId(title, artistParam):
     str or None
         The videoId of the track in the compendium. None if the track is not found.
     """
+    artistSimThreshold = 80
+    titleSimThreshold = 90
+    separators = ["&", "and", ","]
     compendium = jt.loadJson("ytm_compendium.json")
     logger.debug(f"Checking YTM ID for \"{title}\" with artist \"{artistParam}\"")
     for track in compendium:
-        similarityThreshold = 80
         compendiumTitle = track["title"].lower()
         noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower()
-        if title.lower() == compendiumTitle or title.lower() == noFeatureTitle:
-            for artistListed in track.get('artists', []):
+        if fuzz.ratio(title.lower(), compendiumTitle) > titleSimThreshold or fuzz.ratio(title.lower(), noFeatureTitle) > titleSimThreshold:
+            compendiumArtists = track.get('artists', [])
+            # Logic for multiple artists in singular artist key
+            if len(compendiumArtists) == 1 and any(separator in compendiumArtists[0]["name"] for separator in separators):
+                splitName = re.split('&|and|,', compendiumArtists[0]["name"])
+                compendiumArtists = [{"name": name.strip(), "id": None} for name in splitName]
+                logger.debug(f"Found singular artist with multiple names, splitted: {compendiumArtists}")
+            for artistListed in compendiumArtists:
                 # Logic for multiple artists in lastfm
-                splitKey = None
-                if "&" in artistParam:
-                    splitKey = "&"
-                elif "and" in artistParam:
-                    splitKey = "and"
-                elif "," in artistParam:
-                    splitKey = ","
-                artistParamSplitList = artistParam.split(splitKey) if splitKey is not None else [artistParam]
-                matchedArtistSplitted = any(fuzz.ratio(artistParamSplit.lower().strip(), artistListed['name'].lower()) > similarityThreshold for artistParamSplit in artistParamSplitList)
+                artistParamSplitted = re.split('&|and|,', artistParam)
+                matchedArtistSplitted = any(fuzz.ratio(artistParamSplit.lower().strip(), artistListed['name'].lower()) > artistSimThreshold for artistParamSplit in artistParamSplitted)
                 # Logic for single artist in lastfm
-                matchedArtistNoSplit = fuzz.ratio(artistParam.lower(), artistListed['name'].lower()) > similarityThreshold
+                matchedArtistNoSplit = fuzz.ratio(artistParam.lower(), artistListed['name'].lower()) > artistSimThreshold
                 if matchedArtistSplitted or matchedArtistNoSplit:
                     logger.debug(f"Match found! fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
                     return track["videoId"]
