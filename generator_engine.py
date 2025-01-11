@@ -159,23 +159,26 @@ def checkYTMId(title, artistParam):
     logger.debug(f"Checking YTM ID for \"{title}\" with artist \"{artistParam}\"")
     for track in compendium:
         compendiumTitle = track["title"].lower()
-        noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower()
-        if fuzz.ratio(title.lower(), compendiumTitle) > titleSimThreshold or fuzz.ratio(title.lower(), noFeatureTitle) > titleSimThreshold:
-            compendiumArtists = track.get('artists', [])
-            # Logic for multiple artists in singular artist key
-            if len(compendiumArtists) == 1 and any(separator in compendiumArtists[0]["name"] for separator in separators):
-                splitName = re.split('&|and|,', compendiumArtists[0]["name"])
-                compendiumArtists = [{"name": name.strip(), "id": None} for name in splitName]
-                logger.debug(f"Found singular artist with multiple names, splitted: {compendiumArtists}")
-            for artistListed in compendiumArtists:
-                # Logic for multiple artists in lastfm
-                artistParamSplitted = re.split('&|and|,', artistParam)
-                matchedArtistSplitted = any(fuzz.ratio(artistParamSplit.lower().strip(), artistListed['name'].lower()) > artistSimThreshold for artistParamSplit in artistParamSplitted)
-                # Logic for single artist in lastfm
-                matchedArtistNoSplit = fuzz.ratio(artistParam.lower(), artistListed['name'].lower()) > artistSimThreshold
-                if matchedArtistSplitted or matchedArtistNoSplit:
-                    logger.debug(f"Match found! fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
-                    return track["videoId"]
+        noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower().strip()
+        dehyphenatedTitles = compendiumTitle.split(" - ")
+        titleList = [compendiumTitle, noFeatureTitle] + dehyphenatedTitles
+        for title in titleList:
+            if fuzz.ratio(title.lower(), title) > titleSimThreshold:
+                compendiumArtists = track.get('artists', [])
+                # Logic for multiple artists in singular artist key
+                if len(compendiumArtists) == 1 and any(separator in compendiumArtists[0]["name"] for separator in separators):
+                    splitName = re.split('&|and|,', compendiumArtists[0]["name"])
+                    compendiumArtists = [{"name": name.strip(), "id": None} for name in splitName]
+                    logger.debug(f"Found singular artist with multiple names, splitted: {compendiumArtists}")
+                for artistListed in compendiumArtists:
+                    # Logic for multiple artists in lastfm
+                    artistParamSplitted = re.split('&|and|,', artistParam)
+                    matchedArtistSplitted = any(fuzz.ratio(artistParamSplit.lower().strip(), artistListed['name'].lower()) > artistSimThreshold for artistParamSplit in artistParamSplitted)
+                    # Logic for single artist in lastfm
+                    matchedArtistNoSplit = fuzz.ratio(artistParam.lower(), artistListed['name'].lower()) > artistSimThreshold
+                    if matchedArtistSplitted or matchedArtistNoSplit:
+                        logger.debug(f"Match found! fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
+                        return track["videoId"]
     logger.error("Could not find the track \"" + title + "\" in the Compendium.")
     return None
 
