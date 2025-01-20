@@ -136,13 +136,13 @@ def createMasterList():
     logger.info("MasterList created.")
     return sorted(masterList, key=lambda x: x["score"], reverse=True)
 
-def checkYTMId(title, artistParam):
+def checkYTMId(givenTitle, artistParam):
     """
     Does a cross-check between last.fm and YTM to find the YTM ID of the specific track to be added to the playlist.
 
     Parameters
     ----------
-    title : str
+    givenTitle : str
         The title of the track.
     artist : str
         The artist of the track. Currently unused.
@@ -156,14 +156,14 @@ def checkYTMId(title, artistParam):
     titleSimThreshold = 90
     separators = ["&", "and", ","]
     compendium = jt.loadJson("ytm_compendium.json")
-    logger.debug(f"Checking YTM ID for \"{title}\" with artist \"{artistParam}\"")
+    logger.debug(f"Checking YTM ID for \"{givenTitle}\" with artist \"{artistParam}\"")
     for track in compendium:
         compendiumTitle = track["title"].lower()
-        noFeatureTitle = compendiumTitle.split(" (feat.")[0].lower().strip()
+        noFeatureTitle = compendiumTitle.split(" (feat.")[0].strip()
         dehyphenatedTitles = compendiumTitle.split(" - ")
         titleList = [compendiumTitle, noFeatureTitle] + dehyphenatedTitles
         for title in titleList:
-            if fuzz.ratio(title.lower(), title) > titleSimThreshold:
+            if fuzz.ratio(title.lower(), givenTitle.lower()) > titleSimThreshold:
                 compendiumArtists = track.get('artists', [])
                 # Logic for multiple artists in singular artist key
                 if len(compendiumArtists) == 1 and any(separator in compendiumArtists[0]["name"] for separator in separators):
@@ -179,7 +179,7 @@ def checkYTMId(title, artistParam):
                     if matchedArtistSplitted or matchedArtistNoSplit:
                         logger.debug(f"Match found! fmtitle: \"{title.lower()}\" - compendiumTitle: \"{compendiumTitle}\" - noFeatureTitle: \"{noFeatureTitle}\"")
                         return track["videoId"]
-    logger.error("Could not find the track \"" + title + "\" in the Compendium.")
+    logger.error("Could not find the track \"" + givenTitle + "\" in the Compendium.")
     return None
 
 ############### SCORE CALCULATION ###############
@@ -294,7 +294,7 @@ def recreatePlaylist():
         logger.info("Removing current tracks from the playlist. (Playlist was not empty.)")
         yt.remove_playlist_items(playlistId, currentTracks)
     logger.info("Adding new tracks to the playlist.")
-    time.sleep(15)
+    time.sleep(25)
     currentTracks = yt.get_playlist(playlistId, None).get("tracks") # type: ignore
     while len(currentTracks) == 0:
         logger.error("Playlist is empty. Retrying...")
