@@ -62,7 +62,6 @@ def loadAllPlaylists():
         logger.debug("Playlist fetched and purged.")
         compendium = removeDuplicates(purgedPls, compendium)
     compendium = removeDuplicates(history, compendium)
-    resetCompendium()
     jt.writeIntoJson(compendium, "ytm_compendium.json")
     logger.info("Compendium updated.")
 
