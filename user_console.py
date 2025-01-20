@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.6.1"
+version = "1.6.2"
 # PACKAGE CHECKER
 import subprocess
 import sys
