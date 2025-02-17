@@ -11,3 +11,4 @@ ytm_compendium.json
 rpmplus.log
 .gitignore
 .venv
+releases/
