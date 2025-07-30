@@ -3,7 +3,7 @@
 Replay Mix+ by soreikomori
 https://github.com/soreikomori/ReplayMixPlus
 """
-version = "1.6.2"
+version = "1.6.3"
 import pkg_resources
 import subprocess
 import sys
