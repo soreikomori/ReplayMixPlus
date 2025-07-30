@@ -161,7 +161,8 @@ def checkYTMId(givenTitle, artistParam):
         compendiumTitle = track["title"].lower()
         noFeatureTitle = compendiumTitle.split(" (feat.")[0].strip()
         dehyphenatedTitles = compendiumTitle.split(" - ")
-        titleList = [compendiumTitle, noFeatureTitle] + dehyphenatedTitles
+        noFeatureDehyphenatedTitles = noFeatureTitle.split(" - ")
+        titleList = [compendiumTitle, noFeatureTitle] + dehyphenatedTitles + noFeatureDehyphenatedTitles
         for title in titleList:
             if fuzz.ratio(title.lower(), givenTitle.lower()) > titleSimThreshold:
                 compendiumArtists = track.get('artists', [])
