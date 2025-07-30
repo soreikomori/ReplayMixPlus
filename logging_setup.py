@@ -15,7 +15,7 @@ def setup_logger(verbose):
     """
     logger = logging.getLogger("rpmplusLogger")
     logger.setLevel(logging.DEBUG if verbose else logging.INFO)
-    logHandler = logging.FileHandler("rpmplus.log")
+    logHandler = logging.FileHandler("rpmplus.log", encoding="utf-8")
     logFormatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     logHandler.setFormatter(logFormatter)
     logger.addHandler(logHandler)
