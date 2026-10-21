@@ -1,4 +1,4 @@
-anyio==4.9.0
+anyio==4.14.2
 certifi==2025.7.14
 charset-normalizer==3.4.2
 h11==0.16.0
